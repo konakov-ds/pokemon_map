@@ -3,7 +3,7 @@ import json
 
 from django.http import HttpResponseNotFound, request
 from django.shortcuts import render
-from .models import PokemonEntity
+from .models import PokemonEntity, Pokemon
 
 
 MOSCOW_CENTER = [55.751244, 37.618423]
@@ -28,24 +28,25 @@ def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
 
 
 def show_all_pokemons(request):
-    pokemons = PokemonEntity.objects.all()
+    pokemon_entities = PokemonEntity.objects.all()
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
 
-    for pokemon in pokemons:
+    for entity in pokemon_entities:
             add_pokemon(
-                folium_map, pokemon.lat,
-                pokemon.lon,
-                request.build_absolute_uri(pokemon.pokemon.image.url)
+                folium_map, entity.lat,
+                entity.lon,
+                request.build_absolute_uri(entity.pokemon.image.url)
             )
 
     pokemons_on_page = []
+    pokemons = Pokemon.objects.all()
 
     for pokemon in pokemons:
-        if pokemon.pokemon.image:
+        if pokemon.image:
             pokemons_on_page.append({
                 'pokemon_id': pokemon.id,
-                'img_url': request.build_absolute_uri(pokemon.pokemon.image.url),
-                'title_ru': pokemon.pokemon.title,
+                'img_url': request.build_absolute_uri(pokemon.image.url),
+                'title_ru': pokemon.title,
             })
 
     return render(request, 'mainpage.html', context={
@@ -56,13 +57,13 @@ def show_all_pokemons(request):
 
 def show_pokemon(request, pokemon_id):
     pokemon_entities = PokemonEntity.objects.filter(pokemon__id=pokemon_id)
-    print()
     pokemon = {}
     if not pokemon_entities:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
     else:
-        pokemon_obj = PokemonEntity.objects.filter(pokemon__id=pokemon_id).first().pokemon
+        pokemon_obj = pokemon_entities.first().pokemon
         pokemon['title_ru'] = pokemon_obj.title
+        pokemon['description'] = pokemon_obj.description
         pokemon['img_url'] = pokemon_obj.image.url
         folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
         for entity in pokemon_entities:
