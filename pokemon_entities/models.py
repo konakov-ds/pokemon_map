@@ -9,6 +9,7 @@ class Pokemon(models.Model):
     image = models.ImageField(upload_to='pokemons_img', blank=True, null=True)
     previous_evolution = models.ForeignKey(
         "self",
+        related_name='previous_evolutions',
         on_delete=models.SET('Неизвестно'),
         default=None,
         null=True,
