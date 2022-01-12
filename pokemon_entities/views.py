@@ -67,7 +67,6 @@ def show_pokemon(request, pokemon_id):
         pokemon['title_jp'] = pokemon_obj.title_jp
         pokemon['description'] = pokemon_obj.description
         pokemon['img_url'] = pokemon_obj.image.url
-        print(pokemon_obj.previous_evolutions.all())
         if pokemon_obj.previous_evolution:
             pokemon['previous_evolution'] = {}
             pokemon['previous_evolution']['pokemon_id'] = pokemon_obj.previous_evolution.id
