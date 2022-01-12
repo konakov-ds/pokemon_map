@@ -67,7 +67,14 @@ def show_pokemon(request, pokemon_id):
         pokemon['title_jp'] = pokemon_obj.title_jp
         pokemon['description'] = pokemon_obj.description
         pokemon['img_url'] = pokemon_obj.image.url
+        if pokemon_obj.previous_evolution:
+            pokemon['previous_evolution'] = {}
+            pokemon['previous_evolution']['pokemon_id'] = pokemon_obj.previous_evolution.id
+            pokemon['previous_evolution']['title_ru'] = pokemon_obj.previous_evolution.title_ru
+            pokemon['previous_evolution']['img_url'] = pokemon_obj.previous_evolution.image.url
+
         folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
+
         for entity in pokemon_entities:
                 add_pokemon(
                     folium_map,  entity.lat,
