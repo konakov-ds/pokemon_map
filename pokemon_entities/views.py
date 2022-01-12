@@ -1,7 +1,6 @@
 import folium
-import json
 
-from django.http import HttpResponseNotFound, request
+from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from .models import PokemonEntity, Pokemon
 
@@ -30,17 +29,14 @@ def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
 def show_all_pokemons(request):
     pokemon_entities = PokemonEntity.objects.all()
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-
     for entity in pokemon_entities:
             add_pokemon(
                 folium_map, entity.lat,
                 entity.lon,
                 request.build_absolute_uri(entity.pokemon.image.url)
             )
-
     pokemons_on_page = []
     pokemons = Pokemon.objects.all()
-
     for pokemon in pokemons:
         if pokemon.image:
             pokemons_on_page.append({
@@ -48,7 +44,6 @@ def show_all_pokemons(request):
                 'img_url': request.build_absolute_uri(pokemon.image.url),
                 'title_ru': pokemon.title_ru,
             })
-
     return render(request, 'mainpage.html', context={
         'map': folium_map._repr_html_(),
         'pokemons': pokemons_on_page,
@@ -68,18 +63,19 @@ def show_pokemon(request, pokemon_id):
         pokemon['description'] = pokemon_obj.description
         pokemon['img_url'] = pokemon_obj.image.url
         if pokemon_obj.previous_evolution:
-            pokemon['previous_evolution'] = {}
-            pokemon['previous_evolution']['pokemon_id'] = pokemon_obj.previous_evolution.id
-            pokemon['previous_evolution']['title_ru'] = pokemon_obj.previous_evolution.title_ru
-            pokemon['previous_evolution']['img_url'] = pokemon_obj.previous_evolution.image.url
+            pokemon['previous_evolution'] = {
+                'pokemon_id': pokemon_obj.previous_evolution.id,
+                'title_ru': pokemon_obj.previous_evolution.title_ru,
+                'img_url': pokemon_obj.previous_evolution.image.url
+            }
         if pokemon_obj.previous_evolutions.first():
-            pokemon['next_evolution'] = {}
-            pokemon['next_evolution']['pokemon_id'] = pokemon_obj.previous_evolutions.first().id
-            pokemon['next_evolution']['title_ru'] = pokemon_obj.previous_evolutions.first().title_ru
-            pokemon['next_evolution']['img_url'] = pokemon_obj.previous_evolutions.first().image.url
+            pokemon['next_evolution'] = {
+                'pokemon_id': pokemon_obj.previous_evolutions.first().id,
+                'title_ru': pokemon_obj.previous_evolutions.first().title_ru,
+                'img_url': pokemon_obj.previous_evolutions.first().image.url
+            }
 
         folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-
         for entity in pokemon_entities:
                 add_pokemon(
                     folium_map,  entity.lat,
