@@ -8,22 +8,19 @@ class Pokemon(models.Model):
     )
     title_en = models.CharField(
         max_length=200,
-        default=None,
+        default='',
         blank=True,
-        null=True,
         verbose_name='Название, англ.'
     )
     title_jp = models.CharField(
         max_length=200,
-        default=None,
+        default='',
         blank=True,
-        null=True,
         verbose_name='Название, япон.'
     )
     description = models.TextField(
-        default=None,
+        default='',
         blank=True,
-        null=True,
         verbose_name='Описание'
     )
     image = models.ImageField(
@@ -36,7 +33,6 @@ class Pokemon(models.Model):
         "self",
         related_name='previous_evolutions',
         on_delete=models.SET('Неизвестно'),
-        default=None,
         null=True,
         blank=True,
         verbose_name='Из кого эволюционирует'
