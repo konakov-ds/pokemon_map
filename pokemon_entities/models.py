@@ -8,18 +8,15 @@ class Pokemon(models.Model):
     )
     title_en = models.CharField(
         max_length=200,
-        default='',
         blank=True,
         verbose_name='Название, англ.'
     )
     title_jp = models.CharField(
         max_length=200,
-        default='',
         blank=True,
         verbose_name='Название, япон.'
     )
     description = models.TextField(
-        default='',
         blank=True,
         verbose_name='Описание'
     )
@@ -32,7 +29,7 @@ class Pokemon(models.Model):
     previous_evolution = models.ForeignKey(
         "self",
         related_name='next_evolution',
-        on_delete=models.SET('Неизвестно'),
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         verbose_name='Из кого эволюционирует'
@@ -46,7 +43,6 @@ class PokemonEntity(models.Model):
     pokemon = models.ForeignKey(
         Pokemon,
         on_delete=models.CASCADE,
-        default=Pokemon.objects.last().id,
         verbose_name='Покемон',
         related_name='pokemon_entities',
     )
@@ -57,43 +53,36 @@ class PokemonEntity(models.Model):
         verbose_name='Долгота'
     )
     appeared_at = models.DateTimeField(
-        default=None,
         blank=True,
         null=True,
         verbose_name='Когда появится'
     )
     disappeared_at = models.DateTimeField(
-        default=None,
         blank=True,
         null=True,
         verbose_name='Когда исчезнет'
     )
     level = models.IntegerField(
-        default=None,
         blank=True,
         null=True,
         verbose_name='Уровень'
     )
     health = models.IntegerField(
-        default=None,
         blank=True,
         null=True,
         verbose_name='Очки жизни'
     )
     strength = models.IntegerField(
-        default=None,
         blank=True,
         null=True,
         verbose_name='Очки силы'
     )
     defense = models.IntegerField(
-        default=None,
         blank=True,
         null=True,
         verbose_name='Очки защиты'
     )
     stamina = models.IntegerField(
-        default=None,
         blank=True,
         null=True,
         verbose_name='Очки выносливости'
