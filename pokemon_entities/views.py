@@ -51,27 +51,28 @@ def show_all_pokemons(request):
 
 def show_pokemon(request, pokemon_id):
     pokemon = Pokemon.objects.filter(id=pokemon_id).first()
-    pokemon_wrapper = {}
     if not pokemon:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
-    pokemon_wrapper['title_ru'] = pokemon.title_ru
-    pokemon_wrapper['title_en'] = pokemon.title_en
-    pokemon_wrapper['title_jp'] = pokemon.title_jp
-    pokemon_wrapper['description'] = pokemon.description
-    pokemon_wrapper['img_url'] = pokemon.image.url
+    pokemon_content = {
+        'title_ru': pokemon.title_ru,
+        'title_en': pokemon.title_en,
+        'title_jp': pokemon.title_jp,
+        'description': pokemon.description,
+        'img_url': pokemon.image.url
+    }
     if pokemon.previous_evolution:
-        pokemon_wrapper['previous_evolution'] = {
+        pokemon_content['previous_evolution'] = {
             'pokemon_id': pokemon.previous_evolution.id,
             'title_ru': pokemon.previous_evolution.title_ru,
             'img_url': pokemon.previous_evolution.image.url
         }
-    if pokemon.next_evolution.first():
-        pokemon_wrapper['next_evolution'] = {
-            'pokemon_id': pokemon.next_evolution.first().id,
-            'title_ru': pokemon.next_evolution.first().title_ru,
-            'img_url': pokemon.next_evolution.first().image.url
+    next_evolution = pokemon.next_evolution.first()
+    if next_evolution:
+        pokemon_content['next_evolution'] = {
+            'pokemon_id': next_evolution.id,
+            'title_ru': next_evolution.title_ru,
+            'img_url': next_evolution.image.url
         }
-
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for entity in pokemon.entities.all():
         add_pokemon(
@@ -80,5 +81,5 @@ def show_pokemon(request, pokemon_id):
             request.build_absolute_uri(entity.pokemon.image.url)
         )
     return render(request, 'pokemon.html', context={
-                'map': folium_map._repr_html_(), 'pokemon': pokemon_wrapper
+                'map': folium_map._repr_html_(), 'pokemon': pokemon_content
             })
